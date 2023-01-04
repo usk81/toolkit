@@ -33,18 +33,6 @@ func Chunk[T any](vs []T, size int) (rs [][]T, err error) {
 	return
 }
 
-// Combine creates an slice by using one slice for keys and another for its values
-func Combine[K comparable, V any](keys []K, values []V) (map[K]V, error) {
-	if len(keys) != len(values) {
-		return nil, errors.New("error")
-	}
-	result := map[K]V{}
-	for i := range keys {
-		result[keys[i]] = values[i]
-	}
-	return result, nil
-}
-
 // Compact creates an slice with all zero values removed
 func Compact[T comparable](vs []T) []T {
 	var zero T

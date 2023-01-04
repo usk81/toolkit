@@ -15,6 +15,8 @@ func less[T constraints.Ordered](a, b T) bool { return a < b }
 
 func lessBool(_, b bool) bool { return b }
 
+func TestChunk(t *testing.T) {}
+
 func TestExists(t *testing.T) {
 	type args[T comparable] struct {
 		v  T
