@@ -164,8 +164,8 @@ func TestKeys(t *testing.T) {
 			},
 		},
 		Runner: func(t *testing.T, tt testCaseForKeys[string]) {
-			t.Parallel()
 			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
 				got := Keys(tt.args.values)
 				if diff := cmp.Diff(got, tt.want, cmpopts.SortSlices(less[string])); diff != "" {
 					t.Errorf("Combine() = %v, want %v, diff %s", got, tt.want, diff)
