@@ -15,14 +15,101 @@ func less[T constraints.Ordered](a, b T) bool { return a < b }
 
 func lessBool(_, b bool) bool { return b }
 
-func TestChunk(t *testing.T) {}
+func TestChunk(t *testing.T) {
+	type args[T comparable] struct {
+		vs   []T
+		size int
+	}
+	type testCaseForChunk[T comparable] struct {
+		name    string
+		args    args[T]
+		want    [][]T
+		wantErr bool
+	}
+
+	tests := []testkit.Testable{}
+
+	tests = append(tests, testkit.TestCase[testCaseForChunk[string]]{
+		Describe: "case_string",
+		Cases: []testCaseForChunk[string]{
+			{
+				name: "can be split evenly",
+				args: args[string]{
+					vs: []string{
+						"a",
+						"b",
+						"c",
+						"d",
+					},
+					size: 2,
+				},
+				want: [][]string{
+					{
+						"a",
+						"b",
+					},
+					{
+						"c",
+						"d",
+					},
+				},
+				wantErr: false,
+			},
+			{
+				name: "can't be split evenly",
+				args: args[string]{
+					vs: []string{
+						"a",
+						"b",
+						"c",
+						"d",
+						"e",
+					},
+					size: 2,
+				},
+				want: [][]string{
+					{
+						"a",
+						"b",
+					},
+					{
+						"c",
+						"d",
+					},
+					{
+						"e",
+					},
+				},
+				wantErr: false,
+			},
+		},
+		Runner: func(t *testing.T, tt testCaseForChunk[string]) {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
+				got, err := Chunk(tt.args.vs, tt.args.size)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Chunk() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("Chunk() = %v, want %v", got, tt.want)
+				}
+			})
+		},
+	})
+
+	for _, tt := range tests {
+		tt := tt
+		tt.Test(t)
+	}
+}
 
 func TestExists(t *testing.T) {
 	type args[T comparable] struct {
 		v  T
 		xs []T
 	}
-	type testCase[T comparable] struct {
+	type testCaseForExists[T comparable] struct {
 		name string
 		args args[T]
 		want bool
@@ -31,9 +118,9 @@ func TestExists(t *testing.T) {
 	tests := []testkit.Testable{}
 
 	// string
-	tests = append(tests, testkit.TestCase[testCase[string]]{
+	tests = append(tests, testkit.TestCase[testCaseForExists[string]]{
 		Describe: "case_string",
-		Cases: []testCase[string]{
+		Cases: []testCaseForExists[string]{
 			{
 				name: "exist",
 				args: args[string]{
@@ -84,7 +171,7 @@ func TestExists(t *testing.T) {
 				want: false,
 			},
 		},
-		Runner: func(t *testing.T, tt testCase[string]) {
+		Runner: func(t *testing.T, tt testCaseForExists[string]) {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
 				if got := Exists(tt.args.v, tt.args.xs); got != tt.want {
@@ -95,9 +182,9 @@ func TestExists(t *testing.T) {
 	})
 
 	// int
-	tests = append(tests, testkit.TestCase[testCase[int]]{
+	tests = append(tests, testkit.TestCase[testCaseForExists[int]]{
 		Describe: "case_int",
-		Cases: []testCase[int]{
+		Cases: []testCaseForExists[int]{
 			{
 				name: "exist",
 				args: args[int]{
@@ -168,7 +255,7 @@ func TestExists(t *testing.T) {
 				want: false,
 			},
 		},
-		Runner: func(t *testing.T, tt testCase[int]) {
+		Runner: func(t *testing.T, tt testCaseForExists[int]) {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
 				if got := Exists(tt.args.v, tt.args.xs); got != tt.want {
@@ -179,9 +266,9 @@ func TestExists(t *testing.T) {
 	})
 
 	// boolean
-	tests = append(tests, testkit.TestCase[testCase[bool]]{
+	tests = append(tests, testkit.TestCase[testCaseForExists[bool]]{
 		Describe: "case_bool",
-		Cases: []testCase[bool]{
+		Cases: []testCaseForExists[bool]{
 			{
 				name: "exist_true",
 				args: args[bool]{
@@ -231,7 +318,7 @@ func TestExists(t *testing.T) {
 				want: false,
 			},
 		},
-		Runner: func(t *testing.T, tt testCase[bool]) {
+		Runner: func(t *testing.T, tt testCaseForExists[bool]) {
 			t.Run(tt.name, func(t *testing.T) {
 				t.Parallel()
 				if got := Exists(tt.args.v, tt.args.xs); got != tt.want {
