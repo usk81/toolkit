@@ -1,6 +1,10 @@
 # Toolkit
 
+`Toolkit` is Go utility library with the generics implementation.
+
 ## Install
+
+`Toolkit` methods are splited into standalone by method package.
 
 ```shell
 // iterator
